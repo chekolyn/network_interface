@@ -10,20 +10,20 @@ netmask {{ item.netmask }}
 {% if item.gateway is defined %}
 gateway {{ item.gateway }}
 {% endif %}
-{% if item.ports is defined %}        
+{% if item.ports is defined %}
 bridge_ports {{ item.ports|join(' ') }}
 {% endif %}
-{% if item.stp is defined %}        
+{% if item.stp is defined %}
 bridge_stp {{ item.stp }}
 {% endif %}
 {% endif %}
 
 {% if item.bootproto == 'dhcp' %}
 iface {{ item.device }}  inet dhcp
-{% if item.ports is defined %}        
+{% if item.ports is defined %}
 bridge_ports {{ item.port }}
 {% endif %}
-{% if item.stp is defined %}        
+{% if item.stp is defined %}
 bridge_stp {{ item.stp }}
 {% endif %}
 {% endif %}
@@ -31,6 +31,23 @@ bridge_stp {{ item.stp }}
 {% if item.route is defined %}
 {% for i in item.route %}
 up route add -net {{ i.network }}  netmask {{ i.netmask }} gw {{ i.gateway }} dev {{ item.device }}
+down route add -net {{ i.network }}  netmask {{ i.netmask }} gw {{ i.gateway }} dev {{ item.device }}
 {% endfor %}
 {% endif %}
 
+# Network Source Routing:
+# Add ip rule for each source route
+{% if item.source_route is defined and item.bootproto == 'static' %}
+
+# Add iproute2 rules:
+{% for rt  in item.source_route %}
+post-up ip  rule add from {{ rt.source_dev_ip }} table {{ rt.name }}
+pre-down ip rule del from {{ rt.source_dev_ip }} table {{ rt.name }}
+{% endfor %}
+
+# Add iproute2 routes:
+{% for rt in item.source_route %}
+post-up ip  route add default via {{ rt.source_gw }} dev {{ item.device }} table {{ rt.name }}
+pre-down ip route del default via {{ rt.source_gw }} dev {{ item.device }} table {{ rt.name }}
+{% endfor %}
+{% endif %}

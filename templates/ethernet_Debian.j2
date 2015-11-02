@@ -20,5 +20,23 @@ iface {{ item.device }}  inet dhcp
 {% if item.route is defined %}
 {% for i in item.route %}
 up route add -net {{ i.network }}  netmask {{ i.netmask }} gw {{ i.gateway }} dev {{ item.device }}
+down route add -net {{ i.network }}  netmask {{ i.netmask }} gw {{ i.gateway }} dev {{ item.device }}
+{% endfor %}
+{% endif %}
+
+# Network Source Routing:
+# Add ip rule for each source route
+{% if item.source_route is defined and item.bootproto == 'static' %}
+
+# Add iproute2 rules:
+{% for rt  in item.source_route %}
+post-up ip  rule add from {{ rt.source_dev_ip }} table {{ rt.name }}
+pre-down ip rule del from {{ rt.source_dev_ip }} table {{ rt.name }}
+{% endfor %}
+
+# Add iproute2 routes:
+{% for rt in item.source_route %}
+post-up ip  route add default via {{ rt.source_gw }} dev {{ item.device }} table {{ rt.name }}
+pre-down ip route del default via {{ rt.source_gw }} dev {{ item.device }} table {{ rt.name }}
 {% endfor %}
 {% endif %}

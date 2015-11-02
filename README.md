@@ -134,12 +134,26 @@ Describe your network configuration for each host in host vars:
               - network: 192.168.200.0
                 netmask: 255.255.255.0
                 gateway: 192.168.10.1
+           - device: eth4
+             bootproto: static
+             address:  8.8.8.8
+             netmask:  255.255.255.0
+             source_route:
+              - id: 200
+                name: public_source
+                source_dev: 8.8.8.8
+                source_ge: 8.8.8.1
+
     network_bond_interfaces:
             - device: bond0
               bootproto: dhcp
               bond_mode: 802.3ad
               bond_miimon: 100
               bond_slaves: [eth2, eth3]
+
+    source_routing_tables:
+            - id: 200
+              name: public_source
 
 ### host_vars/host2
 
@@ -177,4 +191,3 @@ Author Information
 ------------------
 
 Benno Joy
-
