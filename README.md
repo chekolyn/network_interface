@@ -141,8 +141,8 @@ Describe your network configuration for each host in host vars:
              source_route:
               - id: 200
                 name: public_source
-                source_dev: 8.8.8.8
-                source_ge: 8.8.8.1
+                source_dev_ips: [8.8.8.8, 8.8.4.4]
+                source_gw: 8.8.8.1
 
     network_bond_interfaces:
             - device: bond0
