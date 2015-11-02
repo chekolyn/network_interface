@@ -52,7 +52,10 @@ down ip rule del from {{ source_dev_ip }} table {{ rt.name }}
 # Add iproute2 routes:
 {% for rt in item.source_route %}
 post-up ip  route add default via {{ rt.source_gw }} dev {{ item.device }} table {{ rt.name }}
+post-up ip  route add {{ rt.network }}/{{ rt.netmask }} dev {{ item.device }} table {{ rt.name }}
+
 pre-down ip route del default via {{ rt.source_gw }} dev {{ item.device }} table {{ rt.name }}
+pre-down ip route del {{ rt.network }}/{{ rt.netmask }} dev {{ item.device }} table {{ rt.name }}
 {% endfor %}
 
 {% endif %}
