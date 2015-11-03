@@ -13,9 +13,6 @@ gateway {{ item.gateway }}
 {% if item.ports is defined %}
 bridge_ports {{ item.ports|join(' ') }}
 {% endif %}
-{% if item.stp is defined %}
-bridge_stp {{ item.stp }}
-{% endif %}
 {% endif %}
 
 {% if item.bootproto == 'dhcp' %}
@@ -23,10 +20,13 @@ iface {{ item.device }}  inet dhcp
 {% if item.ports is defined %}
 bridge_ports {{ item.port }}
 {% endif %}
-{% if item.stp is defined %}
-bridge_stp {{ item.stp }}
 {% endif %}
-{% endif %}
+
+{# Start Bridge Settings #}
+bridge_stp {{ item.stp | default(bridge_stp) }}
+bridge_waitport {{ item.waitport | default(bridge_waitport) }}
+bridge_fd {{ item.fd | default(bridge_fd) }}
+{# End Bridge Settings #}
 
 {% if item.route is defined %}
 {% for i in item.route %}
