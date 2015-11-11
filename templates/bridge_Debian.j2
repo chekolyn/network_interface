@@ -18,7 +18,14 @@ bridge_ports {{ item.ports|join(' ') }}
 {% if item.bootproto == 'dhcp' %}
 iface {{ item.device }}  inet dhcp
 {% if item.ports is defined %}
-bridge_ports {{ item.port }}
+bridge_ports {{ item.ports|join(' ') }}
+{% endif %}
+{% endif %}
+
+{% if item.bootproto == 'manual' %}
+iface {{ item.device }}  inet manual
+{% if item.ports is defined %}
+bridge_ports {{ item.ports|join(' ') }}
 {% endif %}
 {% endif %}
 
